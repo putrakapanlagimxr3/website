@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByyVerse - Platform Tools Lengkap</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ByyVerse">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    
+    <!-- Windows Tiles -->
+    <meta name="msapplication-TileColor" content="#647cf7">
+    <meta name="msapplication-TileImage" content="icons/icon-144x144.png">
+    <meta name="theme-color" content="#647cf7">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Critical Loading Styles untuk mencegah FOUT -->
+    <style id="critical-loading-styles">
+    /* Critical Loading */
+    #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+    .loading-content {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+    }
+    </style>
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font yang lebih bagus untuk ByyVerse -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+    
+    <!-- Style khusus untuk font loading ByyVerse -->
+    <style>
+        .loading-logo {
+            font-family: 'Montserrat', 'Outfit', sans-serif;
+            font-size: 3.2rem !important;
+            font-weight: 800;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+            animation: logoEntrance 1.2s ease-out forwards;
+            opacity: 0;
+            letter-spacing: -0.5px;
+        }
+        
+        .loading-logo .byy {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .loading-logo .verse {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        
+        .logo {
+            font-family: 'Outfit', 'Montserrat', sans-serif;
+        }
+        
+        .hero-title {
+            font-family: 'Outfit', 'Montserrat', sans-serif;
+        }
+        
+        @keyframes logoEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes morphShape {
+            0%, 100% {
+                border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+                transform: rotate(0deg);
+            }
+            25% {
+                border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%;
+            }
+            50% {
+                border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+                transform: rotate(180deg);
+            }
+            75% {
+                border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
+            }
+        }
+        
+        @keyframes floatParticle {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(10px, -15px) scale(1.1);
+            }
+            66% {
+                transform: translate(-5px, 10px) scale(0.9);
+            }
+        }
+        
+        /* New Trading Chart Styles */
+        .trading-chart {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .chart-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+        
+        .grid-line {
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .chart-path {
+            fill: none;
+            stroke: #647cf7;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 10px rgba(100, 124, 247, 0.3));
+        }
+        
+        .chart-point {
+            fill: white;
+            stroke: #647cf7;
+            stroke-width: 2;
+            r: 5;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .chart-point:hover {
+            r: 8;
+            fill: #647cf7;
+            filter: drop-shadow(0 0 8px rgba(100, 124, 247, 0.6));
+        }
+        
+        /* Tool Card Click Animation */
+        .tool-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tool-card:active {
+            transform: scale(0.97) !important;
+            opacity: 0.9;
+        }
+        
+        .tool-card-click-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(100, 124, 247, 0.3);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* Enhanced Security Styles */
+        .byyverse-immediate-warning {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        .byyverse-final-warning {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Selection blocking */
+        *::selection {
+            background: rgba(100, 124, 247, 0.1) !important;
+            color: inherit !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen SIMPEL & ELEGAN -->
+    <div id="loading-screen">
+        <!-- Background Gradient -->
+        <div class="loading-bg-gradient"></div>
+        
+        <!-- Geometric Particles -->
+        <div class="geometric-particles" id="geometricParticles"></div>
+        
+        <!-- Loading Content -->
+        <div class="loading-content">
+            <!-- Animated Logo Container -->
+            <div class="logo-container-simple">
+                <div class="logo-shape-morph" id="logoShape">
+                    <div class="shape-inner"></div>
+                </div>
+            </div>
+            
+            <!-- Loading Text -->
+            <div class="loading-text-simple">
+                <span class="byy">Byy</span><span class="verse">Verse</span>
+            </div>
+            
+            <!-- Simple Progress Bar -->
+            <div class="simple-progress">
+                <div class="simple-progress-bar" id="simpleProgress"></div>
+            </div>
+            
+            <!-- Loading Status -->
+            <div class="loading-status-simple">
+                <div class="loading-percentage" id="loadingPercentage">0%</div>
+                <div class="loading-message" id="loadingStatus">Initializing...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo" onclick="showNotification('ByyVerse Platform Activated!', 'success')">
+                    <i class="fas fa-bolt"></i>
+                    <span>ByyVerse</span>
+                </div>
+                <div class="tagline">All-in-One Tools Platform</div>
+            </div>
+            
+            <div class="header-actions-wrapper">
+                <!-- API Status Indicator -->
+                <div class="api-status-container">
+                    <div class="api-status" id="apiStatus">
+                        <div class="status-indicator" id="statusIndicator"></div>
+                        <span id="statusText">Checking API...</span>
+                    </div>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button class="notification-btn" onclick="showNotification('No new notifications', 'info')" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Home Page (Default) -->
+            <div id="homePage" class="page active">
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="hero-title">
+                            <span class="gradient-text floating-words">Byyverse Tools</span> 
+                            <span class="wave-text" style="display: inline-block;">
+                                <span>P</span><span>l</span><span>a</span><span>t</span><span>f</span><span>o</span><span>r</span><span>m</span>
+                            </span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            Akses semua tools favorit Anda dalam satu platform yang powerful dan elegan.
+                            Gratis, cepat, dan tanpa batasan.
+                        </p>
+                        
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <div class="stat-number animated-gradient-text">20+</div>
+                                <div class="stat-label">Tools</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number animated-gradient-text">100%</div>
+                                <div class="stat-label">Gratis</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number animated-gradient-text">24/7</div>
+                                <div class="stat-label">Online</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-illustration">
+                        <div class="floating-element">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="floating-element">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="floating-element">
+                            <i class="fas fa-download"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Platform Statistics Section REDESIGNED -->
+                <div class="platform-stats-section">
+                    <!-- Title with new animation -->
+                    <h2 class="section-title glitch-text-enhanced">
+                        <i class="fas fa-chart-network"></i> <span class="neon-wave-text-enhanced">Platform Analytics</span>
+                    </h2>
+                    
+                    <!-- New Stats Cards Design -->
+                    <div class="stats-grid-enhanced">
+                        <div class="stat-card-enhanced">
+                            <div class="stat-icon">
+                                <i class="fas fa-users"></i>
+                                <div class="pulse-ring"></div>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="liveUsers">10,543</div>
+                                <div class="stat-label">Active Users</div>
+                                <div class="stat-trend up">
+                                    <i class="fas fa-arrow-up"></i> 12%
+                                </div>
+                            </div>
+                            <div class="stat-chart-mini">
+                                <div class="mini-chart-bar" style="height: 60%"></div>
+                                <div class="mini-chart-bar" style="height: 80%"></div>
+                                <div class="mini-chart-bar" style="height: 70%"></div>
+                                <div class="mini-chart-bar" style="height: 90%"></div>
+                                <div class="mini-chart-bar" style="height: 75%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card-enhanced">
+                            <div class="stat-icon">
+                                <i class="fas fa-download"></i>
+                                <div class="pulse-ring"></div>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="liveDownloads">245,876</div>
+                                <div class="stat-label">Downloads Today</div>
+                                <div class="stat-trend up">
+                                    <i class="fas fa-arrow-up"></i> 8%
+                                </div>
+                            </div>
+                            <div class="stat-chart-mini">
+                                <div class="mini-chart-bar" style="height: 70%"></div>
+                                <div class="mini-chart-bar" style="height: 85%"></div>
+                                <div class="mini-chart-bar" style="height: 65%"></div>
+                                <div class="mini-chart-bar" style="height: 95%"></div>
+                                <div class="mini-chart-bar" style="height: 80%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card-enhanced">
+                            <div class="stat-icon">
+                                <i class="fas fa-bolt"></i>
+                                <div class="pulse-ring"></div>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="liveUptime">99.8%</div>
+                                <div class="stat-label">Uptime</div>
+                                <div class="stat-trend stable">
+                                    <i class="fas fa-check"></i> Stable
+                                </div>
+                            </div>
+                            <div class="stat-chart-mini">
+                                <div class="mini-chart-bar" style="height: 95%"></div>
+                                <div class="mini-chart-bar" style="height: 98%"></div>
+                                <div class="mini-chart-bar" style="height: 99%"></div>
+                                <div class="mini-chart-bar" style="height: 97%"></div>
+                                <div class="mini-chart-bar" style="height: 99%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card-enhanced">
+                            <div class="stat-icon">
+                                <i class="fas fa-robot"></i>
+                                <div class="pulse-ring"></div>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="liveAIRequests">15,234</div>
+                                <div class="stat-label">AI Requests</div>
+                                <div class="stat-trend up">
+                                    <i class="fas fa-arrow-up"></i> 25%
+                                </div>
+                            </div>
+                            <div class="stat-chart-mini">
+                                <div class="mini-chart-bar" style="height: 80%"></div>
+                                <div class="mini-chart-bar" style="height: 90%"></div>
+                                <div class="mini-chart-bar" style="height: 85%"></div>
+                                <div class="mini-chart-bar" style="height: 95%"></div>
+                                <div class="mini-chart-bar" style="height: 88%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Chart Section - SERVICE ANALYTICS -->
+                    <div class="chart-section-enhanced">
+                        <div class="chart-header-enhanced">
+                            <h3><i class="fas fa-chart-line"></i> Service Analytics</h3>
+                            <div class="chart-controls">
+                                <button class="chart-period-btn active" onclick="changeChartPeriod('live')">
+                                    <i class="fas fa-bolt"></i> Live
+                                </button>
+                                <button class="chart-period-btn" onclick="changeChartPeriod('hour')">
+                                    <i class="fas fa-clock"></i> 1 Hour
+                                </button>
+                                <button class="chart-period-btn" onclick="changeChartPeriod('day')">
+                                    <i class="fas fa-calendar-day"></i> 24 Hours
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container-enhanced">
+                            <div class="chart-canvas">
+                                <div class="enhanced-chart-container">
+                                    <!-- Grid background -->
+                                    <div class="service-chart-grid"></div>
+                                    
+                                    <!-- SVG untuk chart -->
+                                    <svg id="lineChartSVG" width="100%" height="100%" 
+                                         viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet"></svg>
+                                </div>
+                            </div>
+                            
+                            <!-- Legend di sisi kanan -->
+                            <div class="chart-legend-enhanced">
+                                <h4 class="legend-title">
+                                    <i class="fas fa-chart-bar"></i> Service Metrics
+                                    <span class="legend-update-time" id="legendUpdateTime">updating...</span>
+                                </h4>
+                                <div class="legend-items-container">
+                                    <div class="legend-item-service">
+                                        <div class="legend-service-value" id="totalRequests">1.2K</div>
+                                        <div class="legend-service-label">Current Requests</div>
+                                    </div>
+                                    <div class="legend-item-service">
+                                        <div class="legend-service-value" id="peakUsage">1.8K</div>
+                                        <div class="legend-service-label">Peak Usage</div>
+                                    </div>
+                                    <div class="legend-item-service">
+                                        <div class="legend-service-value" id="activeTools">99.8%</div>
+                                        <div class="legend-service-label">Service Uptime</div>
+                                    </div>
+                                </div>
+                                <div class="legend-stats">
+                                    <div class="legend-stat">
+                                        <span class="stat-label">Avg Response:</span>
+                                        <span class="stat-value">142ms</span>
+                                    </div>
+                                    <div class="legend-stat">
+                                        <span class="stat-label">Errors:</span>
+                                        <span class="stat-value" style="color: #10b981">0.2%</span>
+                                    </div>
+                                    <div class="legend-stat">
+                                        <span class="stat-label">Active Users:</span>
+                                        <span class="stat-value">10.5K</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Timeline -->
+                        <div class="service-timeline">
+                            <div class="timeline-label">12:00</div>
+                            <div class="timeline-label">13:00</div>
+                            <div class="timeline-label">14:00</div>
+                            <div class="timeline-label">15:00</div>
+                            <div class="timeline-label">16:00</div>
+                            <div class="timeline-label">Now</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Metrics -->
+                    <div class="performance-metrics">
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <i class="fas fa-rocket"></i>
+                                <h4>Response Time</h4>
+                            </div>
+                            <div class="metric-value" id="responseTime">0.8s</div>
+                            <div class="metric-progress">
+                                <div class="progress-fill" style="width: 85%"></div>
+                            </div>
+                            <div class="metric-label">Faster than 85% of platforms</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <i class="fas fa-database"></i>
+                                <h4>Data Processed</h4>
+                            </div>
+                            <div class="metric-value" id="dataProcessed">4.2TB</div>
+                            <div class="metric-progress">
+                                <div class="progress-fill" style="width: 92%"></div>
+                            </div>
+                            <div class="metric-label">Monthly bandwidth</div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <i class="fas fa-shield-alt"></i>
+                                <h4>Security Score</h4>
+                            </div>
+                            <div class="metric-value" id="securityScore">100%</div>
+                            <div class="metric-progress">
+                                <div class="progress-fill" style="width: 100%"></div>
+                            </div>
+                            <div class="metric-label">Perfect security rating</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Tools Mini Grid -->
+                <div class="featured-tools-section">
+                    <h2 class="section-title scale-pulse-text">
+                        <i class="fas fa-star"></i> Featured Tools
+                    </h2>
+                    <div class="featured-tools-grid">
+                        <div class="featured-tool-card" onclick="loadTool('tiktok')">
+                            <div class="featured-tool-icon" style="background: linear-gradient(135deg, #000000, #25F4EE, #FE2C55);">
+                                <i class="fab fa-tiktok"></i>
+                            </div>
+                            <div class="featured-tool-content">
+                                <h3>TikTok Downloader</h3>
+                                <p>Download video tanpa watermark</p>
+                                <div class="tool-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <span>4.7</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="featured-tool-card" onclick="loadTool('wormgpt')">
+                            <div class="featured-tool-icon" style="background: linear-gradient(135deg, #10B981, #34D399);">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="featured-tool-content">
+                                <h3>Worm GPT AI</h3>
+                                <p>Advanced AI assistant</p>
+                                <div class="tool-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <span>5.0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="featured-tool-card" onclick="loadTool('instagram')">
+                            <div class="featured-tool-icon" style="background: linear-gradient(135deg, #E1306C, #C13584);">
+                                <i class="fab fa-instagram"></i>
+                            </div>
+                            <div class="featured-tool-content">
+                                <h3>Instagram Downloader</h3>
+                                <p>Download video & stalk profiles</p>
+                                <div class="tool-rating">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                    <span>4.5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Section (Menggantikan Stats Section) -->
+                <div class="footer-section">
+                    <div class="footer-content">
+                        <div class="footer-logo">
+                            <i class="fas fa-bolt"></i>
+                            <span>ByyVerse</span>
+                        </div>
+                        <p class="footer-tagline">Platform All-in-One Tools untuk Kebutuhan Digital Anda</p>
+                        <div class="footer-stats">
+                            <div class="footer-stat">
+                                <i class="fas fa-tools"></i>
+                                <span>20+ Tools</span>
+                            </div>
+                            <div class="footer-stat">
+                                <i class="fas fa-users"></i>
+                                <span>10K+ Users</span>
+                            </div>
+                            <div class="footer-stat">
+                                <i class="fas fa-clock"></i>
+                                <span>24/7 Uptime</span>
+                            </div>
+                        </div>
+                        <div class="footer-links">
+                            <a href="#" onclick="showPage('kontakPage')">Contact</a>
+                            <a href="#" onclick="showNotification('Privacy Policy Coming Soon!', 'info')">Privacy</a>
+                            <a href="#" onclick="showNotification('Terms of Service Coming Soon!', 'info')">Terms</a>
+                            <a href="#" onclick="showNotification('FAQ Coming Soon!', 'info')">FAQ</a>
+                        </div>
+                        <div class="footer-copyright">
+                            © 2024 ByyVerse. All rights reserved.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools Page -->
+            <div id="toolsPage" class="page">
+                <div class="tools-header">
+                    <h2 class="page-title">
+                        <i class="fas fa-cubes"></i> All Tools
+                    </h2>
+                </div>
+
+                <div class="tools-search-section">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchTools" placeholder="Search tools..." oninput="filterTools()">
+                    </div>
+                    
+                    <!-- Kategori Tools -->
+                    <div class="tools-categories-wrapper">
+                        <div class="tools-categories" id="toolsCategories">
+                            <!-- Kategori akan di-load oleh JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tools-container" id="toolsContainer">
+                    <!-- Tools akan di-load oleh JavaScript -->
+                </div>
+            </div>
+
+            <!-- Kontak Page -->
+            <div id="kontakPage" class="page">
+                <div class="kontak-header">
+                    <h2 class="page-title">
+                        <i class="fas fa-envelope"></i> Contact & Support
+                    </h2>
+                </div>
+
+                <div class="kontak-container">
+                    <div class="kontak-card">
+                        <div class="kontak-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <h3>Need Help?</h3>
+                        <p>Hubungi kami untuk bantuan dan dukungan</p>
+                        <div class="kontak-methods">
+                            <div class="method">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>WhatsApp</span>
+                                <div class="method-detail"></div>
+                            </div>
+                            <div class="method">
+                                <i class="fas fa-envelope"></i>
+                                <span>Email</span>
+                                <div class="method-detail"></div>
+                            </div>
+                            <div class="method">
+                                <i class="fab fa-telegram"></i>
+                                <span>Telegram</span>
+                                <div class="method-detail"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Message Form -->
+                        <div class="email-form" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-light);">
+                            <h4 style="margin-bottom: 15px; font-size: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </h4>
+                            <div class="email-input-group" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <input type="email" id="emailInput" placeholder="Your email" 
+                                       style="flex: 1; padding: 10px 15px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.9rem;">
+                            </div>
+                            <textarea id="messageInput" placeholder="Your message..." rows="3" 
+                                      style="width: 100%; padding: 12px 15px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.9rem; margin-bottom: 15px; resize: vertical;"></textarea>
+                            <button onclick="sendEmailMessage()" 
+                                    style="width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="kontak-card">
+                        <div class="kontak-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h3>About ByyVerse</h3>
+                        <p>Platform all-in-one tools untuk kebutuhan digital Anda</p>
+                        <div class="about-stats">
+                            <div class="about-stat">
+                                <i class="fas fa-tools"></i>
+                                <span>20+ Tools</span>
+                            </div>
+                            <div class="about-stat">
+                                <i class="fas fa-users"></i>
+                                <span>10K+ Users</span>
+                            </div>
+                            <div class="about-stat">
+                                <i class="fas fa-clock"></i>
+                                <span>24/7 Uptime</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kontak-card">
+                        <div class="kontak-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Privacy & Terms</h3>
+                        <p>Kami menghargai privasi Anda</p>
+                        <div class="privacy-links">
+                            <a href="#" onclick="showNotification('Privacy Policy Coming Soon!', 'info')">Privacy Policy</a>
+                            <a href="#" onclick="showNotification('Terms of Service Coming Soon!', 'info')">Terms of Service</a>
+                            <a href="#" onclick="showNotification('FAQ Coming Soon!', 'info')">FAQ</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Musik Page -->
+            <div id="musikPage" class="page">
+                <div class="musik-header">
+                    <h2 class="page-title">
+                        <i class="fas fa-music"></i> Music Player
+                    </h2>
+                    <div class="music-controls-header">
+                        <!-- Tab Switcher -->
+                        <div class="tab-switcher">
+                            <button class="tab-btn active" id="localTabBtn" onclick="switchMusicTab('local')">
+                                <i class="fas fa-music"></i> Local Music
+                            </button>
+                            <button class="tab-btn" id="spotifyTabBtn" onclick="switchMusicTab('spotify')">
+                                <i class="fab fa-spotify"></i> Spotify
+                            </button>
+                        </div>
+                        
+                        <div class="music-control-buttons">
+                            <button class="control-btn" onclick="toggleShuffle()" id="shuffleBtn">
+                                <i class="fas fa-random"></i>
+                            </button>
+                            <button class="control-btn" onclick="toggleRepeat()" id="repeatBtn">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Local Music Tab -->
+                <div id="localMusicTab" class="music-tab active">
+                    <div class="musik-container">
+                        <!-- Now Playing -->
+                        <div class="now-playing">
+                            <div class="album-art" id="albumArt">
+                                <i class="fas fa-music"></i>
+                            </div>
+                            <div class="track-info">
+                                <h3 id="currentTrack">Select a Track</h3>
+                                <p id="currentArtist">ByyVerse Music</p>
+                            </div>
+                            <div class="track-controls">
+                                <button class="control-btn" onclick="previousTrack()">
+                                    <i class="fas fa-step-backward"></i>
+                                </button>
+                                <button class="play-btn" onclick="togglePlay()" id="playBtn">
+                                    <i class="fas fa-play"></i>
+                                </button>
+                                <button class="control-btn" onclick="nextTrack()">
+                                    <i class="fas fa-step-forward"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress-container">
+                            <span id="currentTime">0:00</span>
+                            <div class="progress-bar" onclick="seekTrack(event)">
+                                <div class="progress" id="progress"></div>
+                            </div>
+                            <span id="duration">0:00</span>
+                        </div>
+
+                        <!-- Volume Control -->
+                        <div class="volume-control">
+                            <i class="fas fa-volume-down"></i>
+                            <input type="range" id="volumeSlider" min="0" max="100" value="50" oninput="changeVolume(this.value)">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+
+                        <!-- Playlist -->
+                        <div class="playlist">
+                            <h3 class="playlist-title">
+                                <i class="fas fa-list"></i> Playlist
+                            </h3>
+                            <div class="playlist-tracks" id="playlist">
+                                <!-- Tracks akan di-load oleh JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spotify Tab -->
+                <div id="spotifyMusicTab" class="music-tab">
+                    <div class="musik-container">
+                        <!-- Spotify Search Section -->
+                        <div class="spotify-search-section">
+                            <div class="search-input-group">
+                                <input 
+                                    type="text" 
+                                    id="spotifySearchInput" 
+                                    placeholder="Search songs, artists, or albums..."
+                                    onkeypress="if(event.key === 'Enter') searchSpotify()"
+                                >
+                                <button class="spotify-search-btn" onclick="searchSpotify()">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                            
+                            <!-- Search Results -->
+                            <div id="spotifyResults" class="spotify-results">
+                                <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                    <i class="fab fa-spotify fa-2x" style="margin-bottom: 15px; opacity: 0.5;"></i>
+                                    <div style="font-weight: 600; font-size: 16px;">Search for Music</div>
+                                    <div style="font-size: 14px; margin-top: 5px;">
+                                        Enter a song, artist, or album name above
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Spotify Now Playing -->
+                        <div id="spotifyNowPlaying" style="display: none;">
+                            <div class="now-playing">
+                                <div class="album-art" id="spotifyAlbumArt">
+                                    <i class="fab fa-spotify"></i>
+                                </div>
+                                <div class="track-info">
+                                    <h3 id="spotifyTrackTitle">No Track Playing</h3>
+                                    <p id="spotifyArtistName">Search for a song</p>
+                                </div>
+                                <div class="track-controls">
+                                    <button class="control-btn" onclick="spotifyPrevious()">
+                                        <i class="fas fa-step-backward"></i>
+                                    </button>
+                                    <button class="play-btn" onclick="toggleSpotifyPlay()" id="spotifyPlayBtn">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    <button class="control-btn" onclick="spotifyNext()">
+                                        <i class="fas fa-step-forward"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Progress Bar -->
+                            <div class="progress-container">
+                                <span id="spotifyCurrentTime">0:00</span>
+                                <div class="progress-bar" onclick="seekSpotifyTrack(event)">
+                                    <div class="progress" id="spotifyProgress"></div>
+                                </div>
+                                <span id="spotifyDuration">0:00</span>
+                            </div>
+
+                            <!-- Volume Control -->
+                            <div class="volume-control">
+                                <i class="fas fa-volume-down"></i>
+                                <input type="range" id="spotifyVolumeSlider" min="0" max="100" value="50" oninput="changeSpotifyVolume(this.value)">
+                                <i class="fas fa-volume-up"></i>
+                            </div>
+                        </div>
+
+                        <!-- Spotify Loading -->
+                        <div id="spotifyLoading" style="display: none; text-align: center; margin: 40px 0;">
+                            <div class="loading-spinner" style="width: 50px; height: 50px; margin: 0 auto 20px;"></div>
+                            <div style="font-weight: 600; color: var(--text);">Searching Spotify...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tool Container (for tool-specific pages) -->
+            <div id="toolContainer" class="tool-page-wrapper"></div>
+        </main>
+
+        <!-- Bottom Navigation (Hanya Icon) -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="showPage('homePage')" title="Home">
+                <i class="fas fa-home"></i>
+            </button>
+            <button class="nav-btn" onclick="showPage('toolsPage')" title="Tools">
+                <i class="fas fa-cubes"></i>
+            </button>
+            <button class="nav-btn" onclick="showPage('kontakPage')" title="Contact">
+                <i class="fas fa-envelope"></i>
+            </button>
+            <button class="nav-btn" onclick="showPage('musikPage')" title="Music">
+                <i class="fas fa-music"></i>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Notification System -->
+    <div id="notificationContainer"></div>
+
+    <!-- Token Modal -->
+    <div id="tokenModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-lock"></i> 
+                    Token Authentication
+                </h3>
+                <button class="modal-close" onclick="closeTokenModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="token-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+                
+                <div class="token-info">
+                    <h4>Akses Tools Page</h4>
+                    <p>Masukkan token untuk mengakses semua tools. Token valid selama 12 jam.</p>
+                    
+                    <div class="token-input-group">
+                        <div class="input-with-icon">
+                            <i class="fas fa-key"></i>
+                            <input 
+                                type="password" 
+                                id="tokenInput" 
+                                placeholder="Masukkan token akses"
+                                maxlength="20"
+                                autocomplete="off"
+                            />
+                            <button class="show-token-btn" onclick="toggleTokenVisibility()">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="input-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Token: 15 karakter alfanumerik
+                        </div>
+                    </div>
+                    
+                    <div class="token-actions">
+                        <button class="btn-primary" onclick="submitToken()">
+                            <i class="fas fa-unlock"></i> Verify Token
+                        </button>
+                        <button class="btn-secondary" onclick="getTokenLink()">
+                            <i class="fas fa-link"></i> Get Token Link
+                        </button>
+                    </div>
+
+                    <!-- Tambahkan tombol tutorial di bawah token actions -->
+                    <div class="token-link-extra">
+                        <button class="btn-tutorial" onclick="openTutorialLink()">
+                            <i class="fab fa-youtube"></i> Cara Melewati Link (Tutorial)
+                        </button>
+                    </div>
+
+                    <div class="token-note">
+                        <div class="note-header">
+                            <i class="fas fa-shield-alt"></i> Keamanan Token
+                        </div>
+                        <ul class="note-list">
+                            <li>Dapatkan Token Dengan Melewati Link</li>
+                            <li>Sesi token berlaku 12 jam</li>
+                            <li>Jangan bagikan token Anda</li>
+                            <li>Token hanya untuk akses tools</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <div class="session-info" id="sessionInfo">
+                    <i class="fas fa-clock"></i>
+                    <span>Sesi akan berakhir dalam: <span id="sessionTimer">--:--:--</span></span>
+                </div>
+                <button class="btn-logout" onclick="logoutToken()" style="display:none;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Player -->
+    <audio id="audioPlayer" preload="metadata"></audio>
+
+    <!-- Spotify Audio Player -->
+    <audio id="spotifyAudioPlayer" preload="metadata"></audio>
+    
+    <!-- Welcome Sound -->
+    <audio id="welcomeSound" preload="auto">
+        <source src="https://files.catbox.moe/ki5n3e.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Scripts -->
+    <script src="token-auth.js"></script>
+     <script src="console-protect.js"></script>
+    <script src="fungsiaslialltools.js"></script>
+    <script src="main.js"></script>
+   
+</body>
+</html>
